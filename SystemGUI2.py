@@ -106,7 +106,7 @@ class SystemGUI(QWidget):
                     self.alert_admin()
                     self.empty_input_boxes()
                     break
-            return  # exits out of the function
+            return  # exits out of the method
 
         if len(self.usr_id_buffer) < 4:  # Allows only 4 ID characters
             temp_digit = int(digit.text())
@@ -124,7 +124,7 @@ class SystemGUI(QWidget):
             self.card_input.setText(''.join(str(e) for e in self.card_buffer))
 
     """
-    The init_ui Function holds the layout of the GUI
+    The init_ui method holds the layout of the GUI
     and where every object is located.
     """
 
@@ -172,7 +172,7 @@ class SystemGUI(QWidget):
         self.usr_id_input.setText("")
 
     """
-    Function checks that the user has access to the room
+    Method checks that the user has access to the room
     and that the user's entered passwords are valid.
 
     - param password (tuple) : is the input from the user
@@ -203,7 +203,7 @@ class SystemGUI(QWidget):
         self.empty_input_boxes()
 
     """
-    The switch function works like a switch does in other languages.
+    The switch method works like a switch does in other languages.
 
     It returns the value of the passwords associated with
     the User's account depending on the input source.
