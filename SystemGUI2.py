@@ -1,5 +1,8 @@
-import sys, os
+import os
+import sys
+
 from PyQt5.Qt import *
+
 from User import User
 
 
@@ -7,8 +10,12 @@ class SystemGUI(QWidget):
     def __init__(self):
         super().__init__()
         # holders hold the text entered by the user and create a string.
+        self.usr_id_buffer = []
         self.pin_buffer = []
         self.card_buffer = []
+
+        self.usr_id_label = QLabel("ID#: ")
+        self.usr_id_input = QLineEdit()
 
         self.card_label = QLabel("Card: ")
         self.card_input = QLineEdit()
@@ -19,9 +26,19 @@ class SystemGUI(QWidget):
         self.initUI()
 
         # ------------ from Database -------------------------------
-        self.usr = User(user_id='8108', pin='0000', card='123')  # creating a test user
+        self.usr1 = User(user_id='8101', pin='0001', card='123')  # creating a test user
         self.usr_credentials = [('pin', 'card')]  # what the user uses to enter the room
         self.room_number = '429'  # room we are entering
+
+        self.usr2 = User(user_id='8102', pin='0002', card='123')  # creating a test user
+        self.usr_credentials = [('pin', 'card')]  # what the user uses to enter the room
+        self.room_number = '429'  # room we are entering
+
+        self.usr3 = User(user_id='8103', pin='0003', card='123')  # creating a test user
+        self.usr_credentials = [('pin', 'card')]  # what the user uses to enter the room
+        self.room_number = '429'  # room we are entering
+
+        self.user_list = [self.usr1, self.usr2, self.usr3]
         # ------------ end Database -------------------------------
 
     # ActionListener
@@ -30,24 +47,33 @@ class SystemGUI(QWidget):
 
         # Handle Clear button
         if (digit.text() == 'Clear'):
-            self.pin_buffer = []
-            self.card_input.setText("")
-
-            self.card_buffer = []
-            self.pin_input.setText("")
+            self.empty_input_boxes()
             return
 
         # Handle Enter button
-        if (digit.text() == "Enter"):
+        if digit.text() == "Enter":
             self.card_buffer = self.pin_input.text()
 
             pin_pad_input = (str(self.pin_input.text()), str(self.card_input.text()))
             print(pin_pad_input)
 
-            self.check_access(self.usr, self.room_number, self.usr_credentials, pin_pad_input)
+            for user in self.user_list:
+                if self.usr_id_input.text() == user.get_name():
+                    self.check_access(user, self.room_number, self.usr_credentials, pin_pad_input)
+                    self.empty_input_boxes()
+                    break
+                else:
+                    print("Invalid ID.")
+                    self.empty_input_boxes()
+                    break
             return
 
-        if ((len(self.pin_buffer) < 4)):
+        if ((len(self.usr_id_buffer) < 4)):
+            tempDigit = int(digit.text())
+            self.usr_id_buffer.append(tempDigit)
+            self.usr_id_input.setText(''.join(str(e) for e in self.usr_id_buffer))
+
+        elif ((len(self.pin_buffer) < 4)):
             tempDigit = int(digit.text())
             self.pin_buffer.append(tempDigit)
             self.pin_input.setText(''.join(str(e) for e in self.pin_buffer))
@@ -56,7 +82,6 @@ class SystemGUI(QWidget):
             tempDigit = int(digit.text())
             self.card_buffer.append(tempDigit)
             self.card_input.setText(''.join(str(e) for e in self.card_buffer))
-
 
     def initUI(self):
         grid = QGridLayout()
@@ -79,21 +104,30 @@ class SystemGUI(QWidget):
             button.clicked.connect(self.buttonClick)
             grid.addWidget(button, *position)
 
-        grid.addWidget(self.pin_label, 4, 0)
-        grid.addWidget(self.pin_input, 4, 1, 2, 2)
-        grid.addWidget(self.card_label, 6, 0)
-        grid.addWidget(self.card_input, 6, 1, 2, 2)
+        grid.addWidget(self.usr_id_label, 4, 0)
+        grid.addWidget(self.usr_id_input, 4, 1, 2, 2)
+        grid.addWidget(self.pin_label, 6, 0)
+        grid.addWidget(self.pin_input, 6, 1, 2, 2)
+        grid.addWidget(self.card_label, 8, 0)
+        grid.addWidget(self.card_input, 8, 1, 2, 2)
 
         self.move(300, 150)
         self.setWindowTitle('PinPad')
         self.show()
         # ----------------------End initUI--------------------------------
 
+    def empty_input_boxes(self):
+        self.usr_id_buffer, self.pin_buffer, self.card_buffer = [], [], []
+        self.card_input.setText("")
+        self.pin_input.setText("")
+        self.usr_id_input.setText("")
+
     """
     the password is the input from the user
     the input_type is the source of the input
     ( ex. card reader, pin pad, biometrics scanner)
     """
+
     def check_access(self, user, room, input_type, password):
 
         inp = self.switch(user, input_type)
@@ -116,9 +150,10 @@ class SystemGUI(QWidget):
                 print("Admin was not reached!!! ", Exception)
             print("Invalid Password!")
 
-        self.pin_buffer, self.card_buffer = [], []
+        self.usr_id_buffer, self.pin_buffer, self.card_buffer = [], [], []
         self.card_input.setText("")
         self.pin_input.setText("")
+        self.usr_id_input.setText("")
 
     """
     It works like a switch does in other languages.
