@@ -2,6 +2,8 @@
 Class holds all the security information for the users
 trying to gain access to the secure room.
 """
+
+
 class User(object):
     def __init__(self, user_id, pin, card=None, biometrics=None):
 
